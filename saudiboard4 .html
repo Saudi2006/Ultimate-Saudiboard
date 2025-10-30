@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAUDIBOARD 🎨</title>
+<style>
+  body {
+    background-color: #111;
+    color: #fff;
+    font-family: "Tahoma", sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  h2 {
+    text-align: center;
+    margin: 10px;
+    font-size: 1.4em;
+  }
+  #output, #translated {
+    width: 90%;
+    height: 70px;
+    margin: 10px auto;
+    display: block;
+    font-size: 18px;
+    border-radius: 10px;
+    background-color: #222;
+    color: #0f0;
+    padding: 10px;
+    outline: none;
+    border: 1px solid #555;
+  }
+  .keyboard {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #1b1b1b;
+    padding: 6px;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    box-shadow: 0 -3px 10px rgba(0,0,0,0.5);
+  }
+  button {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    font-size: 17px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #555;
+  }
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px auto;
+  }
+</style>
+</head>
+<body>
+
+<h2>🎨 SAUDIBOARD 🎨</h2>
+
+<textarea id="output" placeholder="النص الناتج..."></textarea>
+
+<div class="action-buttons">
+  <button onclick="copyText()">📋 نسخ النص</button>
+  <button onclick="translateText()">🌐 ترجمة للنص الأصلي</button>
+  <button onclick="clearAll()">🗑️ مسح الكل</button>
+</div>
+
+<textarea id="translated" placeholder="النص المترجم..."></textarea>
+
+<div class="keyboard" id="keyboard"></div>
+
+<script>
+const mapping = {
+"ا": "/", "ب": "]'", "ت": "]''", "ث": ']"\'', "ج": ">'", "ح": ">", "خ": "'>", "د": "}", 
+"ذ": "}'", "ر": ")", "ز": "')", "س": "$", "ش": '$"\'', "ص": "€", "ض": "'€", "ط": "|€",
+"ظ": "'|€", "ع": "£", "غ": "'£", "ف": "'&", "ق": '"&', "ك": "√", "ل": "!", "م": "°~", 
+"ن": "'_", "ه": "@", "و": "%", "ي": "¥", "ة": "{@}", "ؤ": "%^", "ء": "^"
+};
+
+const reverseMapping = Object.fromEntries(Object.entries(mapping).map(([k,v]) => [v,k]));
+
+const letters = Object.keys(mapping);
+const keyboard = document.getElementById("keyboard");
+const output = document.getElementById("output");
+const translated = document.getElementById("translated");
+
+letters.forEach(letter => {
+  const btn = document.createElement("button");
+  btn.textContent = letter;
+  btn.onclick = () => output.value += mapping[letter];
+  keyboard.appendChild(btn);
+});
+
+const controlButtons = [
+  {text: "مسافة", action: () => output.value += " "},
+  {text: "مسح", action: () => output.value = output.value.slice(0, -1)},
+  {text: "سطر", action: () => output.value += "\n"}
+];
+controlButtons.forEach(b => {
+  const btn = document.createElement("button");
+  btn.textContent = b.text;
+  btn.onclick = b.action;
+  keyboard.appendChild(btn);
+});
+
+function copyText() {
+  output.select();
+  document.execCommand("copy");
+  alert("✅ تم نسخ النص!");
+}
+
+function translateText() {
+  let text = output.value;
+  let result = text;
+  const sortedKeys = Object.keys(reverseMapping).sort((a,b)=>b.length-a.length);
+  sortedKeys.forEach(symbol => {
+    result = result.split(symbol).join(reverseMapping[symbol]);
+  });
+  translated.value = result;
+}
+
+function clearAll() {
+  output.value = "";
+  translated.value = "";
+}
+</script>
+
+</body>
+</html>
